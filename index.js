@@ -49,6 +49,39 @@ app.post('/create', (req, res) => {
   });
 });
 
+app.post('/checkapi', (req, res) => {
+  const { apikey } = req.body;
+
+  if (!apikey) {
+    return res.status(400).json({
+      valid: false,
+      message: 'API key tidak boleh kosong'
+    });
+  }
+
+  const sql = 'SELECT * FROM apikey WHERE apikeys = ? LIMIT 1';
+  db.query(sql, [apikey], (err, results) => {
+    if (err) {
+      console.error('❌ Error saat cek DB:', err);
+      return res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
+
+    if (results.length > 0) {
+      res.json({
+        valid: true,
+        message: 'API key valid',
+        data: { apikey }
+      });
+    } else {
+      res.status(401).json({
+        valid: false,
+        message: 'API key tidak valid atau tidak ditemukan'
+      });
+    }
+  });
+});
+
+
 
 
 
